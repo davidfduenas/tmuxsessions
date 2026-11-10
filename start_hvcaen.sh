@@ -22,6 +22,11 @@ HV_CMD="python3 caen_shell_v3.py \
   --influx-host ${INFLUX_HOST} --influx-port ${INFLUX_PORT} --influx-db ${INFLUX_DB} \
   --measurement ${HV_MEASUREMENT} --device-tag ${HV_DEVICE_TAG}"
 
+# Split the session's window. Newer tmux (3.1+) uses -l <percent>%; older versions only know -p <percent>.
+split_pane() {   # $1 = -v | -h, $2 = size of the new pane in percent
+    tmux split-window -t "$SESSION" "$1" -l "$2%" 2>/dev/null || tmux split-window -t "$SESSION" "$1" -p "$2"
+}
+
 # Only create if session doesn't exist
 if tmux has-session -t $SESSION 2>/dev/null; then
     echo "Session $SESSION already exists, attaching..."
@@ -40,7 +45,7 @@ sleep 0.3
 tmux send-keys -t $SESSION "clear && $HV_CMD" Enter
 
 # Split bottom 65%
-tmux split-window -t $SESSION -v -p 65
+split_pane -v 65
 
 # Bottom left — voltage
 tmux send-keys -t $SESSION "cd \"$HV_DIR\"" Enter

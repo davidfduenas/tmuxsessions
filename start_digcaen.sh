@@ -21,6 +21,11 @@ TEMP_CMD="\"$DAQ_DIR/utils/read_temp_influx\" \
   --interval ${TEMP_INTERVAL} \
   --verbose"
 
+# Split the session's window. Newer tmux (3.1+) uses -l <percent>%; older versions only know -p <percent>.
+split_pane() {   # $1 = -v | -h, $2 = size of the new pane in percent
+    tmux split-window -t "$SESSION" "$1" -l "$2%" 2>/dev/null || tmux split-window -t "$SESSION" "$1" -p "$2"
+}
+
 # If session already exists, just attach to it
 if tmux has-session -t $SESSION 2>/dev/null; then
     echo "Session $SESSION already exists, attaching..."
@@ -39,7 +44,7 @@ sleep 0.3
 tmux send-keys -t $SESSION "clear && $TEMP_CMD" Enter
 
 # Split bottom 65%
-tmux split-window -t $SESSION -v -p 65
+split_pane -v 65
 
 # Bottom left — orchestrator
 tmux send-keys -t $SESSION "cd \"$DAQ_DIR\"" Enter
