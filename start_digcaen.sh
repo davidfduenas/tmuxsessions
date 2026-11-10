@@ -1,13 +1,24 @@
 #!/usr/bin/env bash
-# NOvA DTG — Digitizer CAEN tmux session startup
+# Digitizer CAEN tmux session startup
+#
+# Override any of these from the environment, e.g.:
+#   DAQ_DIR=$HOME/mydaq INFLUX_DB=mydb ./start_digcaen.sh
 
-SESSION="DIGCAEN"
-TEMP_CMD="~/DAQ_Caen/utils/read_temp_influx \
-  --influx-host 127.0.0.1 \
-  --influx-port 8086 \
-  --influx-db NOvA_DTG_CAEN \
-  --measurement DT5730S \
-  --interval 5 \
+SESSION="${SESSION:-DIGCAEN}"
+DAQ_DIR="${DAQ_DIR:-$HOME/DAQ_Caen}"                         # folder with daq_threshold_v1.0.0 and utils/
+ROOT_SETUP="${ROOT_SETUP:-$HOME/root/bin/thisroot.sh}"       # ROOT environment script
+INFLUX_HOST="${INFLUX_HOST:-127.0.0.1}"
+INFLUX_PORT="${INFLUX_PORT:-8086}"
+INFLUX_DB="${INFLUX_DB:-NOvA_DTG_CAEN}"
+TEMP_MEASUREMENT="${TEMP_MEASUREMENT:-DT5730S}"
+TEMP_INTERVAL="${TEMP_INTERVAL:-5}"
+
+TEMP_CMD="\"$DAQ_DIR/utils/read_temp_influx\" \
+  --influx-host ${INFLUX_HOST} \
+  --influx-port ${INFLUX_PORT} \
+  --influx-db ${INFLUX_DB} \
+  --measurement ${TEMP_MEASUREMENT} \
+  --interval ${TEMP_INTERVAL} \
   --verbose"
 
 # If session already exists, just attach to it
@@ -21,9 +32,9 @@ fi
 tmux new-session -d -s $SESSION
 
 # Top pane (35%) — temperature monitoring
-tmux send-keys -t $SESSION "cd ~/DAQ_Caen" Enter
+tmux send-keys -t $SESSION "cd \"$DAQ_DIR\"" Enter
 sleep 0.3
-tmux send-keys -t $SESSION "source ~/root/bin/thisroot.sh" Enter
+tmux send-keys -t $SESSION "source \"$ROOT_SETUP\"" Enter
 sleep 0.3
 tmux send-keys -t $SESSION "clear && $TEMP_CMD" Enter
 
@@ -31,9 +42,9 @@ tmux send-keys -t $SESSION "clear && $TEMP_CMD" Enter
 tmux split-window -t $SESSION -v -p 65
 
 # Bottom left — orchestrator
-tmux send-keys -t $SESSION "cd ~/DAQ_Caen" Enter
+tmux send-keys -t $SESSION "cd \"$DAQ_DIR\"" Enter
 sleep 0.3
-tmux send-keys -t $SESSION "source ~/root/bin/thisroot.sh" Enter
+tmux send-keys -t $SESSION "source \"$ROOT_SETUP\"" Enter
 sleep 0.3
 tmux send-keys -t $SESSION "clear" Enter
 
@@ -41,9 +52,9 @@ tmux send-keys -t $SESSION "clear" Enter
 tmux split-window -t $SESSION -h
 
 # Bottom right — manual threshold runs
-tmux send-keys -t $SESSION "cd ~/DAQ_Caen" Enter
+tmux send-keys -t $SESSION "cd \"$DAQ_DIR\"" Enter
 sleep 0.3
-tmux send-keys -t $SESSION "source ~/root/bin/thisroot.sh" Enter
+tmux send-keys -t $SESSION "source \"$ROOT_SETUP\"" Enter
 sleep 0.3
 tmux send-keys -t $SESSION "clear" Enter
 

@@ -1,12 +1,26 @@
 #!/usr/bin/env bash
-# NOvA DTG — HV CAEN tmux session startup
+# HV CAEN tmux session startup
+#
+# Override any of these from the environment, e.g.:
+#   HV_SERIAL_PORT=/dev/ttyACM0 INFLUX_DB=mydb ./start_hvcaen.sh
 
-SESSION="HVCAEN"
+SESSION="${SESSION:-HVCAEN}"
+HV_DIR="${HV_DIR:-$HOME/caen-dt5471p-monitor}"           # folder with caen_shell_v3.py and .venv
+HV_SERIAL_PORT="${HV_SERIAL_PORT:-/dev/ttyDT5471P0}"     # see udev rule in the setup instructions
+HV_BAUDRATE="${HV_BAUDRATE:-9600}"
+HV_CHANNEL="${HV_CHANNEL:-0}"
+HV_PERIOD="${HV_PERIOD:-1.0}"
+INFLUX_HOST="${INFLUX_HOST:-127.0.0.1}"
+INFLUX_PORT="${INFLUX_PORT:-8086}"
+INFLUX_DB="${INFLUX_DB:-NOvA_DTG_CAEN}"
+HV_MEASUREMENT="${HV_MEASUREMENT:-DT5471P}"
+HV_DEVICE_TAG="${HV_DEVICE_TAG:-DT5471P_0}"
+
 HV_CMD="python3 caen_shell_v3.py \
-  --transport usb --serial-port /dev/ttyDT5471P0 --baudrate 9600 \
-  --channel 0 --period 1.0 \
-  --influx-host 127.0.0.1 --influx-port 8086 --influx-db NOvA_DTG_CAEN \
-  --measurement DT5471P --device-tag DT5471P_0"
+  --transport usb --serial-port ${HV_SERIAL_PORT} --baudrate ${HV_BAUDRATE} \
+  --channel ${HV_CHANNEL} --period ${HV_PERIOD} \
+  --influx-host ${INFLUX_HOST} --influx-port ${INFLUX_PORT} --influx-db ${INFLUX_DB} \
+  --measurement ${HV_MEASUREMENT} --device-tag ${HV_DEVICE_TAG}"
 
 # Only create if session doesn't exist
 if tmux has-session -t $SESSION 2>/dev/null; then
@@ -19,7 +33,7 @@ fi
 tmux new-session -d -s $SESSION
 
 # Top pane (35%) — monitoring
-tmux send-keys -t $SESSION "cd ~/caen-dt5471p-monitor" Enter
+tmux send-keys -t $SESSION "cd \"$HV_DIR\"" Enter
 sleep 0.3
 tmux send-keys -t $SESSION "source .venv/bin/activate" Enter
 sleep 0.3
@@ -29,7 +43,7 @@ tmux send-keys -t $SESSION "clear && $HV_CMD" Enter
 tmux split-window -t $SESSION -v -p 65
 
 # Bottom left — voltage
-tmux send-keys -t $SESSION "cd ~/caen-dt5471p-monitor" Enter
+tmux send-keys -t $SESSION "cd \"$HV_DIR\"" Enter
 sleep 0.3
 tmux send-keys -t $SESSION "source .venv/bin/activate" Enter
 sleep 0.3
@@ -39,7 +53,7 @@ tmux send-keys -t $SESSION "clear && $HV_CMD" Enter
 tmux split-window -t $SESSION -h
 
 # Bottom right — current
-tmux send-keys -t $SESSION "cd ~/caen-dt5471p-monitor" Enter
+tmux send-keys -t $SESSION "cd \"$HV_DIR\"" Enter
 sleep 0.3
 tmux send-keys -t $SESSION "source .venv/bin/activate" Enter
 sleep 0.3
