@@ -7,6 +7,10 @@ tmux startup scripts for the CAEN HV supply and the DT5730S digitizer.
 
 Full installation and operating instructions: [SETUP.md in DAQ_Caen](https://github.com/davidfduenas/DAQ_Caen/blob/lab-setup/SETUP.md). The [caen-lab-setup](https://github.com/davidfduenas/caen-lab-setup) repo bundles these scripts with an installer and a Docker setup. In the Docker container they are available as `hv-session` and `daq-session`, with the variables below already set.
 
+## Layout and use
+
+Each script opens one tmux session that fills the terminal it is started in: one wide pane on top and two panes below it. To use both tools at the same time, run `start_hvcaen.sh` in one terminal and `start_digcaen.sh` in another. To leave a session without stopping it, press `Ctrl-b` then `d`; running the script again re-attaches. The scripts split the window with `-l <percent>%` (tmux 3.1 and newer; tested with tmux 3.4) and fall back to `-p <percent>` for older versions (that fallback is untested). The old `-p` form fails with `size missing` on tmux 3.4.
+
 ## Settings
 
 Set as environment variables; the defaults are the lab values.
