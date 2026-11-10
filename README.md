@@ -5,7 +5,7 @@ tmux startup scripts for the CAEN HV supply and the DT5730S digitizer.
 - `start_hvcaen.sh`: three panes running the HV shell from [caen-dt5471p-monitor](https://github.com/davidfduenas/caen-dt5471p-monitor) (monitor, voltage, current).
 - `start_digcaen.sh`: temperature monitor on top, two panes for DAQ runs from [DAQ_Caen](https://github.com/davidfduenas/DAQ_Caen).
 
-Full installation and operating instructions: [SETUP.md in DAQ_Caen](https://github.com/davidfduenas/DAQ_Caen/blob/lab-setup/SETUP.md).
+Full installation and operating instructions: [SETUP.md in DAQ_Caen](https://github.com/davidfduenas/DAQ_Caen/blob/lab-setup/SETUP.md). The [caen-lab-setup](https://github.com/davidfduenas/caen-lab-setup) repo bundles these scripts with an installer and a Docker setup. In the Docker container they are available as `hv-session` and `daq-session`, with the variables below already set.
 
 ## Settings
 
